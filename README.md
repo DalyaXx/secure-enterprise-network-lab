@@ -60,4 +60,16 @@ Implemented the following security policy:
 - VPN (Version 4)
 - Monitoring/logging (Version 5)
 
+## Version 4 — VPN (OpenVPN)
+- Configured OpenVPN server on pfSense (SSL/TLS + User Auth, UDP, AES-256-GCM)
+- Created internal CA and signed server/client certificates
+- Configured VPN client to access the Servers VLAN (192.168.30.0/24) through the tunnel
+- Verified working tunnel from Ubuntu client: authenticated connection, correct routing via tun0, confirmed reachability to Servers VLAN
 
+### Problems encountered
+- Initially created the server certificate with the wrong Certificate Type (User Certificate instead of Server Certificate) — pfSense wouldn't allow deleting it directly since it was in use by the OpenVPN server config; resolved by creating a correctly-typed certificate, reassigning the server to use it, then deleting the old one
+- "Config File Only" export was missing an externally-referenced TLS key file, causing a "cannot pre-load keyfile" error on connection; resolved by using the "Archive" export option instead, which bundles all required files together
+- Tunnel connected and routed correctly but traffic was still blocked — pfSense does not automatically create firewall rules for new OpenVPN interfaces; resolved by adding an explicit Pass rule on the OpenVPN interface tab allowing VPN clients to reach the Servers VLAN
+
+## Next steps
+- Monitoring/logging (Version 5)
