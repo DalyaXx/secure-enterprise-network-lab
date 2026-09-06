@@ -73,3 +73,16 @@ Implemented the following security policy:
 
 ## Next steps
 - Monitoring/logging (Version 5)
+
+## Version 5 — Monitoring & Logging
+- Verified pfSense firewall logging by enabling explicit logging on the Employees→Management block rule
+- Confirmed blocked traffic is correctly captured in Status → System Log → Firewall, showing rule name, source, destination, and protocol
+- Reviewed OpenVPN logs (Status → System Logs → OpenVPN), confirming full connection lifecycle: IP pool assignment, authentication, connection, and clean disconnect
+
+### Problems encountered
+- Blocked traffic initially did not appear in firewall logs — pfSense does not log rule matches by default; resolved by explicitly enabling the "Log packets that are handled by this rule" option on the relevant block rule
+
+## Project Status: Complete (Versions 1-5)
+This lab now demonstrates: virtualized network routing, VLAN segmentation, inter-VLAN firewall policy with correct rule ordering, a functional VPN with certificate-based authentication, and verified logging/monitoring of security events.
+
+
