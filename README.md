@@ -16,7 +16,7 @@ Build a virtualised enterprise network to practice network segmentation, firewal
 - pfSense CE 2.9.0 
 
 ## Architecture 
-[diagram to add]
+![pfSense Dashboard showing VLAN interfaces](images/dashboard.jpg)
 
 ## Problems encoutered 
 - Graphics driver crash on Ubuntu boot - fixed by doing a file-check using fsck -f /dev/sda2 and fixing broken files 
@@ -41,6 +41,8 @@ Implemented the following security policy:
 - Employees -> Management (Blocked)
 - Management -> Everything (Allowed)
 
+![Employees firewall rules with correct ordering](images/firewall_rules.png)
+
 ### Problems encountered
 - Client remained dual-homed on both the original flat LAN and the new
   VLAN simultaneously after tagging, causing traffic to silently bypass
@@ -56,6 +58,8 @@ Implemented the following security policy:
   traffic, correctly ordered between the specific allow and the general
   outbound allow.
 
+![Firewall log showing blocked Employees→Management traffic](images/blocked_management.png)
+
 ## Next steps 
 - VPN (Version 4)
 - Monitoring/logging (Version 5)
@@ -70,6 +74,8 @@ Implemented the following security policy:
 - Initially created the server certificate with the wrong Certificate Type (User Certificate instead of Server Certificate) — pfSense wouldn't allow deleting it directly since it was in use by the OpenVPN server config; resolved by creating a correctly-typed certificate, reassigning the server to use it, then deleting the old one
 - "Config File Only" export was missing an externally-referenced TLS key file, causing a "cannot pre-load keyfile" error on connection; resolved by using the "Archive" export option instead, which bundles all required files together
 - Tunnel connected and routed correctly but traffic was still blocked — pfSense does not automatically create firewall rules for new OpenVPN interfaces; resolved by adding an explicit Pass rule on the OpenVPN interface tab allowing VPN clients to reach the Servers VLAN
+
+![OpenVPN connection lifecycle log](images/vpn_cycle.png)
 
 ## Next steps
 - Monitoring/logging (Version 5)
