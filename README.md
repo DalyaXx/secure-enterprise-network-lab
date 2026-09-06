@@ -4,33 +4,60 @@
 Build a virtualised enterprise network to practice network segmentation, firewall configuration, and secure routing using pfsense and Linux.
 
 ## Current status : Version 1 - Basic Routing 
--Ubuntu 24.04 client VM 
--pfSense CE 2.9.0 firewall/router VM 
--Two-adapter setup : Wan (NAT) / LAN (Internal Network)
--Ubuntu receives DHCP lease from pfSense (192.168.1.x)
--Verified routing (client -> pfSense LAN -> pfsense WAN -> internet)
+- Ubuntu 24.04 client VM 
+- pfSense CE 2.9.0 firewall/router VM 
+- Two-adapter setup : Wan (NAT) / LAN (Internal Network)
+- Ubuntu receives DHCP lease from pfSense (192.168.1.x)
+- Verified routing (client -> pfSense LAN -> pfsense WAN -> internet)
 
 ## Technologies 
--VirtualBox 7.2.4
--Ubuntu 24.04 LTS 
--pfSense CE 2.9.0 
+- VirtualBox 7.2.4
+- Ubuntu 24.04 LTS 
+- pfSense CE 2.9.0 
 
 ## Architecture 
 [diagram to add]
 
 ## Problems encoutered 
--Graphics driver crash on Ubuntu boot - fixed by doing a file-check using fsck -f /dev/sda2 and fixing broken files 
--pfSense installer defaulted to Plus which failed Negate's online eligibility's check - resolved by explicitely changing the advanced parameters to the CE version during setup
--Ubuntu didn't automatically request a new DHCP lease after switching its network adapter type - resolved with `nmcli device connect enp0s3` and restarting the network manager
+- Graphics driver crash on Ubuntu boot - fixed by doing a file-check using fsck -f /dev/sda2 and fixing broken files 
+- pfSense installer defaulted to Plus which failed Negate's online eligibility's check - resolved by explicitely changing the advanced parameters to the CE version during setup
+- Ubuntu didn't automatically request a new DHCP lease after switching its network adapter type - resolved with `nmcli device connect enp0s3` and restarting the network manager
 
 ## Next Step
--VLan segmentation (Management / Employees / Servers)
--Firewall rules between VLans 
--VPN
--Monitoreing / logging 
+- VLan segmentation (Management / Employees / Servers)
+- Firewall rules between VLans 
+- VPN
+- Monitoreing / logging 
 
+## Version 2 - VLan Segmentation 
+- created 3 VLans on pfSense : Management (VLan 10 192.168.10.0/24), Employees (VLan 20 192.168.20.0/24), Servers (VLan 30 192.168.30.0/24).
+- Configured DHCP server per VLAN
+- Tested VLAN tagging from Ubuntu client using NetworkManager (803.1Q tagged sub-interface), verified correct IP assignement and routing through pfSense per VLan
 
+## Version 3 - Firewall Rules (Inter-VLan Policy)
+Implemented the following security policy:
+- Employees -> Internet (Allowed)
+- Employees -> Servers (Limited to HTTP/HTTPS (TCP 80/443) only)
+- Employees -> Management (Blocked)
+- Management -> Everything (Allowed)
 
+### Problems encountered
+- Client remained dual-homed on both the original flat LAN and the new
+  VLAN simultaneously after tagging, causing traffic to silently bypass
+  VLAN firewall rules via the more permissive default route — resolved
+  by disabling the original LAN connection profile with
+  `nmcli connection down`
+- Initial "Employees to Servers" rule allowed all traffic despite
+  intending to limit it to web ports only, because a broader "allow any"
+  rule above it in the rule list matched first — pfSense evaluates rules
+  top-to-bottom with first-match-wins, so a general allow rule placed
+  above a specific restriction rule causes the restriction to never be
+  evaluated. Fixed by adding an explicit block rule for all other Server
+  traffic, correctly ordered between the specific allow and the general
+  outbound allow.
 
+## Next steps 
+- VPN (Version 4)
+- Monitoring/logging (Version 5)
 
 
